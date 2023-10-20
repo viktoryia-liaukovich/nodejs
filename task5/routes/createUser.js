@@ -9,7 +9,6 @@ module.exports = function createUser(req, res) {
     });
 
     req.on('end', () => {
-        console.log(body);
         let user;
 
         try {
@@ -46,7 +45,7 @@ module.exports = function createUser(req, res) {
                 return;
             }
         }
-        user.id = users.length + 1;
+        user.id = (users[users.length - 1]?.id || 0) + 1;
         users.push(user);
         fs.writeFileSync(path.resolve(__dirname, '../data/users.json'), JSON.stringify(users), { encoding: 'utf-8' });
 
