@@ -2,11 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const { sendError } = require('../helpers');
 
-module.exports = function deleteUser(req, res) {
+module.exports = function getUserById(req, res) {
     const userId = Number(req.id);
 
     if (!userId || isNaN(userId)) {
-        sendError(res, 400, 'User id must be a number more than 0');
+        sendError(res, 400, 'User id must be a number more than 0')
         return;
     }
 
@@ -21,17 +21,26 @@ module.exports = function deleteUser(req, res) {
         }
     }
 
-    const userToDelete = users.find((user) => user.id === userId);
+    const user = users.find((user) => user.id === userId);
 
-    if (!userToDelete) {
+    if (!user) {
         sendError(res, 404, `User with id '${userId}' not found`);
         return;
     }
 
-    const filteredUsers = users.filter((user) => user.id !== userId);
-    fs.writeFileSync(path.resolve(__dirname, '../data/users.json'), JSON.stringify(filteredUsers), { encoding: 'utf-8' });
-
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(userToDelete));
+    res.setHeader('Cache-Control', 'max-age=86400');
+    res.end(JSON.stringify({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        links: [
+            {
+                rel: 'hobbies',
+                href: `/user/hobbies/${user.id}`,
+            }
+        ]
+    }));
+
 }
