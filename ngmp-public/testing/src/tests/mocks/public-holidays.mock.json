@@ -1,0 +1,28 @@
+[
+    {
+      "date": "2023-01-01",
+      "localName": "Nowy Rok",
+      "name": "New Year's Day",
+      "countryCode": "PL",
+      "fixed": true,
+      "global": true,
+      "counties": null,
+      "launchYear": null,
+      "types": [
+        "Public"
+      ]
+    },
+    {
+      "date": "2023-01-06",
+      "localName": "Święto Trzech Króli",
+      "name": "Epiphany",
+      "countryCode": "PL",
+      "fixed": true,
+      "global": true,
+      "counties": null,
+      "launchYear": null,
+      "types": [
+        "Public"
+      ]
+    }
+  ]
