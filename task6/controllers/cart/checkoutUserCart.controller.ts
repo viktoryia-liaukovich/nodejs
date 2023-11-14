@@ -1,10 +1,12 @@
 import { Request, Response } from 'express';
 import { performCheckoutUserCart } from '../../repositories/carts.repository';
+import { getUserById } from '../../repositories/users.repository';
 
-export function checkoutUserCart(req: Request, res: Response) {
+export async function checkoutUserCart(req: Request, res: Response) {
   const userId = req.headers['x-user-id'] as string;
 
-  const order = performCheckoutUserCart(userId);
+  const user = await getUserById(userId);
+  const order = await performCheckoutUserCart(user.cartId);
 
   if (!order) {
     res.status(400).send('Cart is empty');

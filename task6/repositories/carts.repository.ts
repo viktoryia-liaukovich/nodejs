@@ -1,39 +1,50 @@
-import { currentUserCarts, deletedCarts } from "../data/carts";
+import { CartModel} from "../types/carts";
 import { v4 as uuid } from "uuid";
-import { ORDER_STATUS, orders } from "../data/orders";
+import { ORDER_STATUS } from "../types/orders";
+import { sequelize } from "../models";
+import { updateUser } from "./users.repository";
+import { getProducts } from "./products.repository";
+import { ProductModel } from "../types/products";
 
-export const getCartByUserId = (id: string) => {
-  return currentUserCarts[id] = currentUserCarts[id] || {
-    id: uuid(),
-    items: []
-  };
+export const getCartById = (id: string): Promise<CartModel> => {
+  return sequelize.models.Cart.findByPk(id);
 };
 
-export const clearUserCart = (userId: string) => {
-  const userCart = getCartByUserId(userId);
-
-  const deletedUserCarts = deletedCarts[userId] = deletedCarts[userId] || [];
-
-  deletedUserCarts.push(JSON.parse(JSON.stringify({
-    ...userCart,
-    isDeleted: true,
-  })));
-
-  userCart.id = uuid();
-  userCart.items = [];
+export const updateCart = async (cart: CartModel) => {
+  cart.changed('items', true);
+  return cart.save();
 };
 
-export const performCheckoutUserCart = (userId: string) => {
-  const userOrders = orders[userId] = orders[userId] || [];
+export const clearUserCart = async (cartId: string, isDeleted?: boolean) => {
+  const cart = await getCartById(cartId);
 
-  const cart = currentUserCarts[userId];
+  if (isDeleted) {
+    cart.isDeleted = true;
+    const newCart = await sequelize.models.Cart.create({
+      id: uuid(),
+      userId: cart.userId,
+    });
+    await updateUser(cart.userId, newCart.id);
+  } else {
+    cart.items = [];
+  }
+
+  await updateCart(cart);
+};
+
+export const performCheckoutUserCart = async (cartId: string) => {
+  const cart = await getCartById(cartId);
 
   if (cart?.items.length) {
+    const products = await getProducts();
+
+    console.log('CART', cart.toJSON());
+
     const order = {
       id: uuid(),
-      userId,
+      userId: cart.userId,
       cartId: cart.id,
-      items: JSON.parse(JSON.stringify(cart.items)),
+      items: cart.items,
       payment: {
         type: 'paypal',
         address: 'London',
@@ -46,18 +57,21 @@ export const performCheckoutUserCart = (userId: string) => {
       comments: '',
       status: ORDER_STATUS.created,
       total: cart.items.reduce((acc, item) => {
-        acc += item.count * item.product.price;
+        const product = products.find((prod: ProductModel) => prod.id === item.productId);
+        acc += item.count * (product?.price || 0);
         return acc;
       }, 0),
     };
 
-    userOrders.push(order);
+    const orderObj = await sequelize.models.Order.create(order);
 
     // empty cart and create new cart uuid
-    clearUserCart(userId);
+    await clearUserCart(cartId, true);
 
-    return order;
+    return orderObj;
   } else {
+    console.log('NULL');
+
     return null;
   }
 };

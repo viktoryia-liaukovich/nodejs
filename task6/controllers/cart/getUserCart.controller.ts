@@ -1,12 +1,20 @@
 import { Request, Response } from 'express';
-import { getCartByUserId } from '../../repositories/carts.repository';
+import { getCartById } from '../../repositories/carts.repository';
+import { getUserById } from '../../repositories/users.repository';
+import { getProducts } from '../../repositories/products.repository';
 
-export function getUserCart(req: Request, res: Response) {
+export async function getUserCart(req: Request, res: Response) {
   const userId = req.headers['x-user-id'] as string;
 
-  const userCart = getCartByUserId(userId);
-  const totalCount = userCart.items?.reduce((acc, item) => {
-    acc += item.count * item.product.price;
+  const user = await getUserById(userId);
+  const userCart = await getCartById(user.cartId);
+
+  const allProducts = await getProducts();
+
+  const totalCount = userCart.items.reduce((acc, item) => {
+    const product = allProducts.find((product) => product.id === item.productId);
+
+    acc += item.count * (product?.price || 0);
     return acc;
   }, 0);
 
