@@ -1,10 +1,9 @@
-import { ProductModel } from "../types/products";
-import { sequelize } from "../models";
+import Product, { IProduct } from "../models/products";
 
-export function getProducts(): Promise<ProductModel[]> {
-    return sequelize.models.Products.findAll();
+export function getProducts(): Promise<IProduct[]> {
+    return Product.find({});
 };
 
-export function findProductById(id: string): Promise<ProductModel> {
-    return sequelize.models.Products.findByPk(id);
+export function findProductById(id: string): Promise<IProduct | null> {
+    return Product.findOne({id}).exec();
 }

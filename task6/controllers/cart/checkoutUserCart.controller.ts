@@ -6,7 +6,7 @@ export async function checkoutUserCart(req: Request, res: Response) {
   const userId = req.headers['x-user-id'] as string;
 
   const user = await getUserById(userId);
-  const order = await performCheckoutUserCart(user.cartId);
+  const order = await performCheckoutUserCart(user?.cartId);
 
   if (!order) {
     res.status(400).send('Cart is empty');

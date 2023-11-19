@@ -7,7 +7,7 @@ export async function deleteUserCart(req: Request, res: Response) {
 
   const user = await getUserById(userId);
 
-  await clearUserCart(user.cartId);
+  await clearUserCart(user?.cartId);
 
   res.status(200).json({
     data: {
