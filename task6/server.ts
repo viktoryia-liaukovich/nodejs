@@ -7,10 +7,13 @@ import { getUserCart } from './controllers/cart/getUserCart.controller';
 import { updateUserCart } from './controllers/cart/updateUserCart.controller';
 import { deleteUserCart } from './controllers/cart/deleteUserCart.controller';
 import { checkoutUserCart } from './controllers/cart/checkoutUserCart.controller';
+import { connect } from 'mongoose';
 
 const app = express();
 const productRouter = express.Router();
 const cartRouter = express.Router();
+
+connect('mongodb://mongoadmin:bdung@127.0.0.1:27017');
 
 app.use(bodyParser.json());
 

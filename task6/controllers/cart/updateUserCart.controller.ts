@@ -29,7 +29,12 @@ export async function updateUserCart(req: Request, res: Response) {
   const { productId, count } = putData.value;
 
   const user = await getUserById(userId);
-  const userCart = await getCartById(user.cartId);
+  const userCart = await getCartById(user?.cartId);
+
+  if (!userCart) {
+    res.status(404).send(`User cart with id ${user?.cartId} not found`);
+    return;
+  }
 
   const itemToUpdate = userCart.items.find((item) => item.productId === productId);
 
@@ -41,7 +46,9 @@ export async function updateUserCart(req: Request, res: Response) {
 
   userCart.items = JSON.parse(JSON.stringify(userCart.items));
 
-  const updatedCart = await updateCart(userCart);
+  await updateCart(userCart);
+
+  const updatedCart = await getCartById(userCart.id);
 
   const products = await getProducts();
 

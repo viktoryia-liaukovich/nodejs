@@ -7,7 +7,12 @@ export async function getUserCart(req: Request, res: Response) {
   const userId = req.headers['x-user-id'] as string;
 
   const user = await getUserById(userId);
-  const userCart = await getCartById(user.cartId);
+  const userCart = await getCartById(user?.cartId);
+
+  if (!userCart) {
+    res.status(404).send(`User cart with id ${user?.cartId} not found`);
+    return;
+  }
 
   const allProducts = await getProducts();
 

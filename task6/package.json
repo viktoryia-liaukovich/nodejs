@@ -5,9 +5,8 @@
   "main": "index.js",
   "scripts": {
     "task6": "nodemon ./server.ts",
-    "task7:migrate": "npx sequelize-cli db:migrate",
-    "task7:seed:up": "npm run task7:migrate && npx sequelize-cli db:seed:all",
-    "task7:seed:down": "npx sequelize-cli db:drop && npx sequelize-cli db:drop"
+    "task8:seed:up": "ts-node ./seeders/seed.ts",
+    "task8:seed:down": "ts-node ./seeders/drop.ts"
   },
   "author": "",
   "license": "ISC",
@@ -16,9 +15,7 @@
     "body-parser": "^1.20.2",
     "express": "^4.18.2",
     "joi": "^17.11.0",
-    "pg": "^8.11.3",
-    "pg-hstore": "^2.3.4",
-    "sequelize": "^6.34.0",
+    "mongoose": "^8.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   },
