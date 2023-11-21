@@ -18,6 +18,13 @@ export const updateCart = async (cart: CartModel) => {
   return Cart.updateOne({id: cart.id}, cart);
 };
 
+export const createCart = (userId: string) => {
+  return Cart.create({
+    id: uuid(),
+    userId: userId,
+  });
+};
+
 export const clearUserCart = async (cartId?: string, isDeleted?: boolean) => {
   if (!cartId) {
     return;
@@ -30,11 +37,8 @@ export const clearUserCart = async (cartId?: string, isDeleted?: boolean) => {
 
   if (isDeleted) {
     cart.isDeleted = true;
-    const newCart = await Cart.create({
-      id: uuid(),
-      userId: cart.userId,
-    });
-    await updateUser(cart.userId, newCart.id);
+    const newCart = await createCart(cart.userId);
+    await updateUser(cart.userId, { cartId: newCart.id });
   } else {
     cart.items = [];
   }
