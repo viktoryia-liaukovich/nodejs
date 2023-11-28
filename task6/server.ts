@@ -24,7 +24,7 @@ const apiRouter = express.Router();
 
 connect('mongodb://mongoadmin:bdung@127.0.0.1:27017');
 
-app.use(morgan('combined'));
+app.use(morgan((tokens, req, res) => `${tokens.method(req, res)} ${Number(tokens.status(req, res))} ${tokens.url(req, res)} :: ${Number.parseFloat(tokens['response-time'](req, res)!)}ms`));
 app.use(bodyParser.json());
 
 // check token middleware
