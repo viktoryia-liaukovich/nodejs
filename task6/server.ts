@@ -12,6 +12,7 @@ import mongoose, { connect } from 'mongoose';
 import { registerUser } from './controllers/api/registerUser.controller';
 import { loginUser } from './controllers/api/loginUser.controller';
 import { isAdmin } from './middleware/isAdmin';
+import morgan from 'morgan';
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ const apiRouter = express.Router();
 
 connect('mongodb://mongoadmin:bdung@127.0.0.1:27017');
 
+app.use(morgan('combined'));
 app.use(bodyParser.json());
 
 // check token middleware
