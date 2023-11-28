@@ -1,6 +1,7 @@
 import Joi from 'joi';
 import { Request, Response } from 'express';
 import { createUser, getUserByEmail } from '../../repositories/users.repository';
+import { Log } from '../../utils/logger';
 
 export const userBodySchema = Joi.object({
   email: Joi.string()
@@ -23,11 +24,15 @@ export async function registerUser(req: Request, res: Response) {
   const user = await getUserByEmail(data.value.email);
 
   if (user) {
-    res.status(400).send(`User with email '${data.value.email}' is already exists!`);
+    const message = `User with email '${data.value.email}' is already exists!`;
+    Log(message);
+
+    res.status(400).send(message);
     return;
   }
 
   const createdUser = await createUser(data.value.email, data.value.password);
 
+  Log('User created successfully!');
   res.status(200).json(createdUser);
 }

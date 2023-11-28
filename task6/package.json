@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "task6": "nodemon ./server.ts",
+    "task6": "NODE_DEBUG=task10 nodemon ./server.ts",
     "task8:seed:up": "ts-node ./seeders/seed.ts",
     "task8:seed:down": "ts-node ./seeders/drop.ts"
   },

@@ -3,6 +3,7 @@ import { getCartById, updateCart } from '../../repositories/carts.repository';
 import { getProducts } from '../../repositories/products.repository';
 import Joi from 'joi';
 import { getUserById } from '../../repositories/users.repository';
+import { Log } from '../../utils/logger';
 
 const putSchema = Joi.object({
     productId: Joi.string()
@@ -57,6 +58,8 @@ export async function updateUserCart(req: Request, res: Response) {
     acc += item.count * (product?.price || 0);
     return acc;
   }, 0);
+
+  Log(`Cart successfully updated for user ${userId}`);
 
   res.status(200).json({
     data: {

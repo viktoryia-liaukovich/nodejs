@@ -13,6 +13,7 @@ import { registerUser } from './controllers/api/registerUser.controller';
 import { loginUser } from './controllers/api/loginUser.controller';
 import { isAdmin } from './middleware/isAdmin';
 import morgan from 'morgan';
+import { Log } from './utils/logger';
 
 dotenv.config();
 
@@ -54,27 +55,27 @@ app.use('/api/products', productRouter);
 app.use('/api/profile/cart', cartRouter);
 
 const server = app.listen(3000, () => {
-    console.log('Server is started on port 3000');
+    Log('Server is started on port 3000');
 });
 
 const shutdownGracefully = () => {
-    console.log('Closing http server.');
+    Log('Closing http server.');
     server.close(() => {
-      console.log('Http server closed.');
-      // boolean means [force], see in mongoose doc
-      mongoose.connection.close(false).then(() => {
-        console.log('MongoDb connection closed.');
-        process.exit(0);
-      });
+        Log('Http server closed.');
+        // boolean means [force], see in mongoose doc
+        mongoose.connection.close(false).then(() => {
+            Log('MongoDb connection closed.');
+            process.exit(0);
+        });
     });
 }
 
 process.on('SIGTERM', () => {
-    console.info('SIGTERM signal received.');
+    Log('SIGTERM signal received.');
     shutdownGracefully();
 });
 
 process.on('SIGINT', () => {
-    console.info('SIGINT signal received.');
+    Log('SIGINT signal received.');
     shutdownGracefully();
 });
