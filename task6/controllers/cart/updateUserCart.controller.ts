@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
-import { getCartByUserId } from '../../repositories/carts.repository';
-import { findProductById } from '../../repositories/products.repository';
+import { getCartById, updateCart } from '../../repositories/carts.repository';
+import { getProducts } from '../../repositories/products.repository';
 import Joi from 'joi';
+import { getUserById } from '../../repositories/users.repository';
 
 const putSchema = Joi.object({
     productId: Joi.string()
@@ -14,7 +15,7 @@ const putSchema = Joi.object({
       .min(0)
 });
 
-export function updateUserCart(req: Request, res: Response) {
+export async function updateUserCart(req: Request, res: Response) {
   const userId = req.headers['x-user-id'] as string;
   const body = req.body;
 
@@ -25,26 +26,34 @@ export function updateUserCart(req: Request, res: Response) {
     return;
   }
 
-  const userCart = getCartByUserId(userId);
+  const { productId, count } = putData.value;
 
-  const itemToUpdate = userCart.items?.find((item) => item.product.id === putData.value.productId);
+  const user = await getUserById(userId);
+  const userCart = await getCartById(user.cartId);
+
+  const itemToUpdate = userCart.items.find((item) => item.productId === productId);
 
   if (itemToUpdate) {
-    itemToUpdate.count = putData.value.count;
+    itemToUpdate.count = count;
   } else {
-    const product = findProductById(putData.value.productId);
-    userCart.items = userCart.items || [];
-    userCart.items.push({product, count: putData.value.count});
+    userCart.items.push({ productId, count });
   }
 
-  const totalCount = userCart.items?.reduce((acc, item) => {
-    acc += item.count * item.product.price;
+  userCart.items = JSON.parse(JSON.stringify(userCart.items));
+
+  const updatedCart = await updateCart(userCart);
+
+  const products = await getProducts();
+
+  const totalCount = userCart.items.reduce((acc, item) => {
+    const product = products.find((prod) => prod.id === item.productId);
+    acc += item.count * (product?.price || 0);
     return acc;
   }, 0);
 
   res.status(200).json({
     data: {
-      cart: userCart,
+      cart: updatedCart,
       total: totalCount || 0
     },
     error: null

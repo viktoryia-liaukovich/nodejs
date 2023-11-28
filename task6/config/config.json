@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "node_gmp",
+    "password": "password123",
+    "database": "node_gmp",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "node_gmp",
+    "password": "password123",
+    "database": "node_gmp",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "node_gmp",
+    "password": "password123",
+    "database": "node_gmp",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  }
+}
