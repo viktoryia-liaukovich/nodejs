@@ -22,7 +22,13 @@ const productRouter = express.Router();
 const cartRouter = express.Router();
 const apiRouter = express.Router();
 
-connect('mongodb://mongoadmin:bdung@127.0.0.1:27017');
+connect('mongodb://mongoadmin:bdung@mongo:27017')
+    .then(() => {
+        Log("Successfully connected to DB");
+    })
+    .catch(() => {
+        Log("Error connecting DB");
+    });
 
 app.use(morgan((tokens, req, res) => `${tokens.method(req, res)} ${Number(tokens.status(req, res))} ${tokens.url(req, res)} :: ${Number.parseFloat(tokens['response-time'](req, res)!)}ms`));
 app.use(bodyParser.json());
@@ -42,7 +48,7 @@ productRouter.get('/:productId', getProductById);
 
 apiRouter.post('/register', registerUser);
 apiRouter.post('/login', loginUser);
-apiRouter.post('/health', (req, res) => {
+apiRouter.get('/health', (req, res) => {
     if (mongoose.connection.readyState === 1) {
         res.status(200).send("OK");
     } else {
