@@ -8,7 +8,7 @@ import { getUserCart } from './controllers/cart/getUserCart.controller';
 import { updateUserCart } from './controllers/cart/updateUserCart.controller';
 import { deleteUserCart } from './controllers/cart/deleteUserCart.controller';
 import { checkoutUserCart } from './controllers/cart/checkoutUserCart.controller';
-import { connect } from 'mongoose';
+import mongoose, { connect } from 'mongoose';
 import { registerUser } from './controllers/api/registerUser.controller';
 import { loginUser } from './controllers/api/loginUser.controller';
 import { isAdmin } from './middleware/isAdmin';
@@ -39,11 +39,40 @@ productRouter.get('/:productId', getProductById);
 
 apiRouter.post('/register', registerUser);
 apiRouter.post('/login', loginUser);
+apiRouter.post('/health', (req, res) => {
+    if (mongoose.connection.readyState === 1) {
+        res.status(200).send("OK");
+    } else {
+        res.status(500).send("Connection to database is not active");
+    }
+});
 
 app.use('/api', apiRouter);
 app.use('/api/products', productRouter);
 app.use('/api/profile/cart', cartRouter);
 
-app.listen(3000, () => {
+const server = app.listen(3000, () => {
     console.log('Server is started on port 3000');
-})
+});
+
+const shutdownGracefully = () => {
+    console.log('Closing http server.');
+    server.close(() => {
+      console.log('Http server closed.');
+      // boolean means [force], see in mongoose doc
+      mongoose.connection.close(false).then(() => {
+        console.log('MongoDb connection closed.');
+        process.exit(0);
+      });
+    });
+}
+
+process.on('SIGTERM', () => {
+    console.info('SIGTERM signal received.');
+    shutdownGracefully();
+});
+
+process.on('SIGINT', () => {
+    console.info('SIGINT signal received.');
+    shutdownGracefully();
+});
