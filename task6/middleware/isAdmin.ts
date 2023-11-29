@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { getUserById } from "../repositories/users.repository";
+import { Log } from "../utils/logger";
 
 export const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
   const userId = req.headers['x-user-id'] as string;
@@ -8,6 +9,8 @@ export const isAdmin = async (req: Request, res: Response, next: NextFunction) =
 
   if (user) {
     if (user?.role !== 'admin') {
+      Log(`Attempt performing restricted action: user '${userId}' is not an admin`);
+
       res.status(403).send('Forbidden');
       return;
     }

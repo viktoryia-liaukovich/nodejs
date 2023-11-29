@@ -12,3 +12,14 @@ services:
             - MONGO_INITDB_ROOT_USERNAME=mongoadmin
             - MONGO_INITDB_ROOT_PASSWORD=bdung
         image: mongo
+    task10:
+        ports:
+            - '3000:3000'
+        container_name: dkrcomp-task10
+        restart: always
+        links:
+            - "mongo:mongo"
+        logging:
+            options:
+                max-size: 1g
+        image: vliaukovich/task10
